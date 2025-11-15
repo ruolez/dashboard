@@ -84,7 +84,14 @@ function renderDashboard() {
   document.querySelectorAll('.dashboard-card').forEach((card) => {
     card.addEventListener('click', () => {
       const itemId = card.dataset.itemId;
-      window.location.href = `/tool/${itemId}`;
+      const openInNewWindow = card.dataset.openInNewWindow === 'true';
+      const url = card.dataset.url;
+
+      if (openInNewWindow) {
+        window.open(url, '_blank');
+      } else {
+        window.location.href = `/tool/${itemId}`;
+      }
     });
   });
 }
@@ -97,7 +104,10 @@ function renderDashboardCard(item) {
   const description = item.description || '';
 
   return `
-    <div class="dashboard-card" data-item-id="${item.id}">
+    <div class="dashboard-card"
+         data-item-id="${item.id}"
+         data-open-in-new-window="${item.open_in_new_window || false}"
+         data-url="${escapeHtml(item.url)}">
       <div class="dashboard-card-icon">${escapeHtml(icon)}</div>
       <div class="dashboard-card-name">${escapeHtml(item.name)}</div>
       ${description ? `<div class="dashboard-card-description">${escapeHtml(description)}</div>` : ''}

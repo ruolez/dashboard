@@ -481,15 +481,16 @@ def api_admin_items_create():
     url = data.get('url', '').strip()
     icon = data.get('icon', '').strip()
     category = data.get('category', '').strip()
+    open_in_new_window = data.get('open_in_new_window', False)
 
     if not name or not url:
         return jsonify({'error': 'Name and URL required'}), 400
 
     result = db.execute_insert(
-        '''INSERT INTO dashboard_items (name, description, url, icon, category, created_by)
-           VALUES (%s, %s, %s, %s, %s, %s)
+        '''INSERT INTO dashboard_items (name, description, url, icon, category, open_in_new_window, created_by)
+           VALUES (%s, %s, %s, %s, %s, %s, %s)
            RETURNING *''',
-        (name, description, url, icon, category, session['user_id']),
+        (name, description, url, icon, category, open_in_new_window, session['user_id']),
     )
     return jsonify(result), 201
 
@@ -504,15 +505,16 @@ def api_admin_items_update(item_id):
     url = data.get('url', '').strip()
     icon = data.get('icon', '').strip()
     category = data.get('category', '').strip()
+    open_in_new_window = data.get('open_in_new_window', False)
 
     if not name or not url:
         return jsonify({'error': 'Name and URL required'}), 400
 
     db.execute_query(
         '''UPDATE dashboard_items
-           SET name = %s, description = %s, url = %s, icon = %s, category = %s
+           SET name = %s, description = %s, url = %s, icon = %s, category = %s, open_in_new_window = %s
            WHERE id = %s''',
-        (name, description, url, icon, category, item_id),
+        (name, description, url, icon, category, open_in_new_window, item_id),
         fetch=False,
     )
     return jsonify({'success': True})

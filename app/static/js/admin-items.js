@@ -73,6 +73,7 @@ function setupEventListeners() {
     document.getElementById('description').value = '';
     document.getElementById('url').value = '';
     document.getElementById('icon').value = '';
+    document.getElementById('openInNewWindow').checked = false;
     document.getElementById('itemModal').style.display = 'flex';
     setupEmojiPicker();
   });
@@ -98,6 +99,7 @@ window.editItem = async function (itemId) {
   document.getElementById('description').value = item.description || '';
   document.getElementById('url').value = item.url;
   document.getElementById('icon').value = item.icon || '';
+  document.getElementById('openInNewWindow').checked = item.open_in_new_window || false;
   document.getElementById('itemModal').style.display = 'flex';
   setupEmojiPicker();
 };
@@ -113,6 +115,7 @@ async function handleItemSubmit(e) {
     description: document.getElementById('description').value.trim(),
     url: document.getElementById('url').value.trim(),
     icon: document.getElementById('icon').value.trim(),
+    open_in_new_window: document.getElementById('openInNewWindow').checked,
   };
 
   try {

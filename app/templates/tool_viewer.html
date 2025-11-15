@@ -250,44 +250,6 @@
         }, 1000);
       }
 
-      // Detect iframe loading errors
-      function detectIframeError() {
-        const iframe = document.getElementById('toolIframe');
-        const errorDiv = document.getElementById('iframeError');
-
-        // Set timeout to detect if iframe fails to load
-        iframeLoadTimeout = setTimeout(() => {
-          try {
-            // Try to access iframe content
-            iframe.contentWindow.document;
-          } catch (e) {
-            // If we get an error, the iframe is blocked
-            showIframeError();
-          }
-        }, 3000);
-
-        // Listen for iframe load
-        iframe.addEventListener('load', () => {
-          clearTimeout(iframeLoadTimeout);
-          try {
-            // Check if we can access the iframe
-            iframe.contentWindow.document;
-          } catch (e) {
-            showIframeError();
-          }
-        });
-
-        // Listen for iframe error
-        iframe.addEventListener('error', () => {
-          showIframeError();
-        });
-      }
-
-      function showIframeError() {
-        document.getElementById('toolIframe').style.display = 'none';
-        document.getElementById('iframeError').classList.add('show');
-      }
-
       function openInNewTab() {
         window.open(itemUrl, '_blank');
       }
@@ -295,7 +257,6 @@
       // Initialize
       document.addEventListener('DOMContentLoaded', () => {
         startUsageTracking();
-        detectIframeError();
       });
 
       // Track page visibility changes

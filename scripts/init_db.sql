@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS dashboard_items (
     url TEXT NOT NULL,
     icon VARCHAR(50),
     category VARCHAR(50),
+    open_in_new_window BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
     CONSTRAINT name_not_empty CHECK (char_length(name) > 0),
