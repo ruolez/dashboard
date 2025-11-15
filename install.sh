@@ -237,7 +237,7 @@ SECRET_KEY=$(openssl rand -hex 32)
 
 # Database Configuration
 POSTGRES_USER=dashboard
-POSTGRES_PASSWORD=$(openssl rand -base64 32)
+POSTGRES_PASSWORD=$(openssl rand -hex 16)
 POSTGRES_DB=dashboard
 
 # Server Configuration
