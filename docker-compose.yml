@@ -3,14 +3,19 @@ services:
   app:
     build: .
     ports:
-      - "5000-5100:5000"
+      - "${PORT:-5000-5100}:5000"
     environment:
-      - DATABASE_URL=postgresql://dashboard:dashboardpass@db:5432/dashboard
-      - SECRET_KEY=dev-secret-key-change-in-production
-      - FLASK_ENV=development
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-dashboard}:${POSTGRES_PASSWORD:-dashboardpass}@db:5432/${POSTGRES_DB:-dashboard}
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
+      - FLASK_ENV=${FLASK_ENV:-development}
+      - FLASK_DEBUG=${FLASK_DEBUG:-1}
       - FLASK_APP=app.main:app
+      - SESSION_COOKIE_SECURE=${SESSION_COOKIE_SECURE:-False}
+      - SESSION_COOKIE_HTTPONLY=${SESSION_COOKIE_HTTPONLY:-True}
+      - SESSION_COOKIE_SAMESITE=${SESSION_COOKIE_SAMESITE:-Lax}
+      - PERMANENT_SESSION_LIFETIME=${PERMANENT_SESSION_LIFETIME:-3600}
     volumes:
-      - ./app:/app/app
+      - ${APP_VOLUME:-./app}:/app/app
     depends_on:
       db:
         condition: service_healthy
@@ -20,9 +25,9 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      - POSTGRES_USER=dashboard
-      - POSTGRES_PASSWORD=dashboardpass
-      - POSTGRES_DB=dashboard
+      - POSTGRES_USER=${POSTGRES_USER:-dashboard}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dashboardpass}
+      - POSTGRES_DB=${POSTGRES_DB:-dashboard}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/init.sql

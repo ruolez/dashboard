@@ -44,6 +44,12 @@ Thumbs.db
 
 # Docker
 docker-compose.override.yml
+docker-compose.yml.backup
 
 # Logs
 *.log
+
+# Installation
+.github_repo
+backup.sql
+*_backup_*/
