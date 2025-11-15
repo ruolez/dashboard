@@ -69,8 +69,8 @@ detect_ip() {
 # Prompt for IP confirmation
 get_server_ip() {
     local detected_ip=$(detect_ip)
-    echo ""
-    print_info "Detected IP address: ${detected_ip}"
+    echo "" >&2
+    print_info "Detected IP address: ${detected_ip}" >&2
     read -p "Is this correct? (y/n): " confirm
 
     if [[ "$confirm" =~ ^[Yy]$ ]]; then
@@ -81,7 +81,7 @@ get_server_ip() {
         if [[ $custom_ip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
             echo "$custom_ip"
         else
-            print_error "Invalid IP address format"
+            print_error "Invalid IP address format" >&2
             exit 1
         fi
     fi
