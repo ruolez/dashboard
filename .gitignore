@@ -50,6 +50,5 @@ docker-compose.yml.backup
 *.log
 
 # Installation
-.github_repo
 backup.sql
 *_backup_*/

@@ -17,7 +17,7 @@ NC='\033[0m' # No Color
 # Configuration
 APP_NAME="dashboard"
 APP_DIR="/opt/${APP_NAME}"
-GITHUB_REPO=""  # Will be set during installation
+GITHUB_REPO="https://github.com/ruolez/dashboard.git"
 NGINX_CONF="/etc/nginx/sites-available/${APP_NAME}"
 NGINX_ENABLED="/etc/nginx/sites-enabled/${APP_NAME}"
 COMPOSE_FILE="${APP_DIR}/docker-compose.yml"
@@ -85,20 +85,6 @@ get_server_ip() {
             exit 1
         fi
     fi
-}
-
-# Prompt for GitHub repository
-get_github_repo() {
-    echo ""
-    print_info "Enter GitHub repository URL (e.g., https://github.com/username/dashboard)"
-    read -p "Repository URL: " repo_url
-
-    if [[ -z "$repo_url" ]]; then
-        print_error "Repository URL cannot be empty"
-        exit 1
-    fi
-
-    echo "$repo_url"
 }
 
 # Install Docker if not present
@@ -281,18 +267,11 @@ clean_install() {
 
     # Get configuration
     SERVER_IP=$(get_server_ip)
-    GITHUB_REPO=$(get_github_repo)
 
     print_info "Installing to: ${APP_DIR}"
     print_info "Server IP: ${SERVER_IP}"
     print_info "GitHub Repo: ${GITHUB_REPO}"
     echo ""
-
-    read -p "Continue with installation? (y/n): " confirm
-    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-        print_warning "Installation cancelled"
-        exit 0
-    fi
 
     # Install dependencies
     print_header "Installing Dependencies"
@@ -310,9 +289,6 @@ clean_install() {
     git clone "${GITHUB_REPO}" "${APP_DIR}"
     cd "${APP_DIR}"
     print_success "Repository cloned"
-
-    # Save GitHub repo URL for updates
-    echo "${GITHUB_REPO}" > "${APP_DIR}/.github_repo"
 
     # Create production configuration
     print_header "Configuring Production Environment"
@@ -366,22 +342,8 @@ update_from_github() {
         exit 1
     fi
 
-    # Read saved GitHub repo
-    if [[ -f "${APP_DIR}/.github_repo" ]]; then
-        GITHUB_REPO=$(cat "${APP_DIR}/.github_repo")
-        print_info "Repository: ${GITHUB_REPO}"
-    else
-        print_warning "GitHub repository not found in installation"
-        GITHUB_REPO=$(get_github_repo)
-        echo "${GITHUB_REPO}" > "${APP_DIR}/.github_repo"
-    fi
-
+    print_info "Repository: ${GITHUB_REPO}"
     echo ""
-    read -p "Continue with update? (y/n): " confirm
-    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-        print_warning "Update cancelled"
-        exit 0
-    fi
 
     # Backup current installation
     print_header "Backing Up Current Installation"
