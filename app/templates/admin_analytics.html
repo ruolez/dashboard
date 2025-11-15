@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Analytics - Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 24px;
+        padding: 24px;
+      }
+
+      .stat-card {
+        background: var(--surface);
+        border: 1px solid var(--outline);
+        border-radius: 12px;
+        padding: 24px;
+      }
+
+      .stat-label {
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+      }
+
+      .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--primary);
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 24px;
+        padding: 24px;
+      }
+
+      .chart-card {
+        background: var(--surface);
+        border: 1px solid var(--outline);
+        border-radius: 12px;
+        padding: 24px;
+      }
+
+      .chart-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        color: var(--text-primary);
+      }
+
+      @media (max-width: 768px) {
+        .charts-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-content">
+        <div class="header-left">
+          <h1 class="header-title">Dashboard Admin</h1>
+          <nav class="header-nav">
+            <a href="/admin/users" class="header-nav-link">Users</a>
+            <a href="/admin/items" class="header-nav-link">Dashboard Items</a>
+            <a href="/admin/analytics" class="header-nav-link active">Analytics</a>
+          </nav>
+        </div>
+        <div class="header-right">
+          <button id="themeToggle" class="theme-toggle">
+            <div class="theme-toggle-slider"></div>
+          </button>
+          <a href="/logout" class="btn btn-secondary">Logout</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <!-- Summary Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Users</div>
+          <div class="stat-value" id="totalUsers">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Tools</div>
+          <div class="stat-value" id="totalItems">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Sessions</div>
+          <div class="stat-value" id="totalSessions">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Hours</div>
+          <div class="stat-value" id="totalHours">-</div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3 class="chart-title">Top Tools (by clicks)</h3>
+          <canvas id="topToolsChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3 class="chart-title">User Activity (Last 30 Days)</h3>
+          <canvas id="activityChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Recent Activity Table -->
+      <div style="padding: 24px;">
+        <h3 class="chart-title">Recent Activity</h3>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Tool</th>
+                <th>Time</th>
+                <th>Duration</th>
+              </tr>
+            </thead>
+            <tbody id="recentActivityBody">
+              <tr>
+                <td colspan="4" class="text-center">Loading...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <script src="/static/js/theme.js"></script>
+    <script src="/static/js/keyboard.js"></script>
+    <script src="/static/js/admin-analytics.js"></script>
+  </body>
+</html>

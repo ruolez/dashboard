@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ item.name }} - Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .tool-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--outline);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        z-index: 1000;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .tool-header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .tool-header-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .back-button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background var(--transition-fast);
+      }
+
+      .back-button:hover {
+        background: var(--primary-hover);
+      }
+
+      .tool-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .session-timer {
+        font-size: 14px;
+        color: var(--text-secondary);
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .tool-iframe-container {
+        margin-top: 60px;
+        width: 100%;
+        height: calc(100vh - 60px);
+      }
+
+      .tool-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+
+      .iframe-error {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        padding: 48px;
+        text-align: center;
+        background: var(--surface);
+      }
+
+      .iframe-error.show {
+        display: flex;
+      }
+
+      .error-icon {
+        font-size: 64px;
+        margin-bottom: 24px;
+        opacity: 0.5;
+      }
+
+      .error-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 12px;
+      }
+
+      .error-message {
+        font-size: 16px;
+        color: var(--text-secondary);
+        margin-bottom: 32px;
+        max-width: 500px;
+        line-height: 1.6;
+      }
+
+      .open-external-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background var(--transition-fast);
+      }
+
+      .open-external-btn:hover {
+        background: var(--primary-hover);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <button class="back-button" onclick="window.location.href='/dashboard'">
+          <span>←</span>
+          <span>Dashboard</span>
+        </button>
+        <div class="tool-title">
+          <span>{{ item.icon if item.icon else '🔧' }}</span>
+          <span>{{ item.name }}</span>
+        </div>
+      </div>
+      <div class="tool-header-right">
+        <div class="session-timer" id="sessionTimer">00:00:00</div>
+        <button id="themeToggle" class="theme-toggle">
+          <div class="theme-toggle-slider"></div>
+        </button>
+      </div>
+    </div>
+
+    <div class="tool-iframe-container">
+      <iframe
+        id="toolIframe"
+        class="tool-iframe"
+        src="{{ item.url }}"
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-downloads"
+        allow="fullscreen"
+      ></iframe>
+      <div id="iframeError" class="iframe-error">
+        <div class="error-icon">🔒</div>
+        <div class="error-title">Cannot Display This Page</div>
+        <div class="error-message">
+          This website blocks embedding in frames for security reasons. Click the button below to open it in a new tab.
+        </div>
+        <button class="open-external-btn" onclick="openInNewTab()">
+          Open in New Tab →
+        </button>
+      </div>
+    </div>
+
+    <script src="/static/js/theme.js"></script>
+    <script>
+      const itemId = {{ item.id }};
+      const itemUrl = "{{ item.url }}";
+      let sessionId = null;
+      let sessionStartTime = null;
+      let timerInterval = null;
+      let iframeLoadTimeout = null;
+
+      // Start usage tracking
+      async function startUsageTracking() {
+        try {
+          const response = await fetch('/api/usage/start', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ item_id: itemId }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            sessionId = data.session_id;
+            sessionStartTime = new Date();
+            startSessionTimer();
+          }
+        } catch (error) {
+          console.error('Error starting usage tracking:', error);
+        }
+      }
+
+      // End usage tracking
+      async function endUsageTracking() {
+        if (!sessionId) return;
+
+        try {
+          // Use Beacon API for reliable tracking on page unload
+          const data = JSON.stringify({ session_id: sessionId });
+          navigator.sendBeacon('/api/usage/end', data);
+        } catch (error) {
+          console.error('Error ending usage tracking:', error);
+        }
+      }
+
+      // Start session timer
+      function startSessionTimer() {
+        const timerElement = document.getElementById('sessionTimer');
+
+        timerInterval = setInterval(() => {
+          const elapsed = Math.floor((new Date() - sessionStartTime) / 1000);
+          const hours = Math.floor(elapsed / 3600);
+          const minutes = Math.floor((elapsed % 3600) / 60);
+          const seconds = elapsed % 60;
+
+          timerElement.textContent = [
+            hours.toString().padStart(2, '0'),
+            minutes.toString().padStart(2, '0'),
+            seconds.toString().padStart(2, '0'),
+          ].join(':');
+        }, 1000);
+      }
+
+      // Detect iframe loading errors
+      function detectIframeError() {
+        const iframe = document.getElementById('toolIframe');
+        const errorDiv = document.getElementById('iframeError');
+
+        // Set timeout to detect if iframe fails to load
+        iframeLoadTimeout = setTimeout(() => {
+          try {
+            // Try to access iframe content
+            iframe.contentWindow.document;
+          } catch (e) {
+            // If we get an error, the iframe is blocked
+            showIframeError();
+          }
+        }, 3000);
+
+        // Listen for iframe load
+        iframe.addEventListener('load', () => {
+          clearTimeout(iframeLoadTimeout);
+          try {
+            // Check if we can access the iframe
+            iframe.contentWindow.document;
+          } catch (e) {
+            showIframeError();
+          }
+        });
+
+        // Listen for iframe error
+        iframe.addEventListener('error', () => {
+          showIframeError();
+        });
+      }
+
+      function showIframeError() {
+        document.getElementById('toolIframe').style.display = 'none';
+        document.getElementById('iframeError').classList.add('show');
+      }
+
+      function openInNewTab() {
+        window.open(itemUrl, '_blank');
+      }
+
+      // Initialize
+      document.addEventListener('DOMContentLoaded', () => {
+        startUsageTracking();
+        detectIframeError();
+      });
+
+      // Track page visibility changes
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          endUsageTracking();
+        }
+      });
+
+      // Track page unload
+      window.addEventListener('beforeunload', () => {
+        endUsageTracking();
+      });
+
+      // Track page pagehide (for mobile)
+      window.addEventListener('pagehide', () => {
+        endUsageTracking();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,37 @@
+
+services:
+  app:
+    build: .
+    ports:
+      - "5000-5100:5000"
+    environment:
+      - DATABASE_URL=postgresql://dashboard:dashboardpass@db:5432/dashboard
+      - SECRET_KEY=dev-secret-key-change-in-production
+      - FLASK_ENV=development
+      - FLASK_APP=app.main:app
+    volumes:
+      - ./app:/app/app
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    command: python -m flask run --host=0.0.0.0 --port=5000
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=dashboard
+      - POSTGRES_PASSWORD=dashboardpass
+      - POSTGRES_DB=dashboard
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dashboard"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 24px;
+        padding: 24px;
+      }
+
+      .dashboard-card {
+        background: var(--surface);
+        border: 1px solid var(--outline);
+        border-radius: 12px;
+        padding: 24px;
+        cursor: pointer;
+        transition: all var(--transition-base);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      .dashboard-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary);
+      }
+
+      .dashboard-card-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+      }
+
+      .dashboard-card-name {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+      }
+
+      .dashboard-card-description {
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 1.5;
+      }
+
+      .category-section {
+        margin-bottom: 32px;
+      }
+
+      .category-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 16px;
+        padding: 0 24px;
+        padding-top: 24px;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 64px 24px;
+        color: var(--text-secondary);
+      }
+
+      .empty-state-icon {
+        font-size: 64px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+      }
+
+      .profile-menu {
+        position: relative;
+        display: inline-block;
+      }
+
+      .profile-button {
+        background: var(--surface-elevated);
+        border: 1px solid var(--outline);
+        border-radius: 8px;
+        padding: 8px 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: var(--text-primary);
+      }
+
+      .profile-button:hover {
+        background: var(--primary-light);
+      }
+
+      .profile-dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        margin-top: 8px;
+        background: var(--surface);
+        border: 1px solid var(--outline);
+        border-radius: 8px;
+        box-shadow: var(--shadow-lg);
+        min-width: 200px;
+        z-index: 1000;
+      }
+
+      .profile-dropdown.show {
+        display: block;
+      }
+
+      .profile-dropdown-item {
+        padding: 12px 16px;
+        cursor: pointer;
+        color: var(--text-primary);
+        text-decoration: none;
+        display: block;
+        transition: background var(--transition-fast);
+      }
+
+      .profile-dropdown-item:hover {
+        background: var(--primary-light);
+      }
+
+      .profile-dropdown-item:first-child {
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+      }
+
+      .profile-dropdown-item:last-child {
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-content">
+        <div class="header-left">
+          <h1 class="header-title">My Dashboard</h1>
+        </div>
+        <div class="header-right">
+          <button id="themeToggle" class="theme-toggle">
+            <div class="theme-toggle-slider"></div>
+          </button>
+
+          <div class="profile-menu">
+            <button class="profile-button" id="profileButton">
+              <span id="usernameDisplay"></span>
+              <span>▾</span>
+            </button>
+            <div class="profile-dropdown" id="profileDropdown">
+              <a href="/change-password" class="profile-dropdown-item">Change Password</a>
+              <a href="/logout" class="profile-dropdown-item">Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main id="mainContent">
+      <div id="dashboardContent"></div>
+    </main>
+
+    <script src="/static/js/theme.js"></script>
+    <script src="/static/js/keyboard.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+  </body>
+</html>

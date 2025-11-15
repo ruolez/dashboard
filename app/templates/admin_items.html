@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Items - Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-content">
+        <div class="header-left">
+          <h1 class="header-title">Dashboard Admin</h1>
+          <nav class="header-nav">
+            <a href="/admin/users" class="header-nav-link">Users</a>
+            <a href="/admin/items" class="header-nav-link active">Dashboard Items</a>
+            <a href="/admin/analytics" class="header-nav-link">Analytics</a>
+          </nav>
+        </div>
+        <div class="header-right">
+          <button id="themeToggle" class="theme-toggle">
+            <div class="theme-toggle-slider"></div>
+          </button>
+          <a href="/logout" class="btn btn-secondary">Logout</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input
+            type="text"
+            id="searchInput"
+            class="search-input"
+            placeholder="Search items..."
+          />
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-primary" id="addItemBtn">+ Add Dashboard Item</button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Icon</th>
+              <th>Name</th>
+              <th>URL</th>
+              <th>Users Assigned</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="itemsTableBody">
+            <tr>
+              <td colspan="5" class="text-center">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <!-- Item Modal -->
+    <div id="itemModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <h2 id="modalTitle">Add Dashboard Item</h2>
+        <form id="itemForm">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" required />
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="url">URL</label>
+            <input type="url" id="url" required placeholder="https://example.com" />
+          </div>
+          <div class="form-group">
+            <label for="icon">Icon (emoji)</label>
+            <input type="text" id="icon" placeholder="🔧" maxlength="4" />
+            <div style="margin-top: 8px; font-size: 24px; display: flex; flex-wrap: wrap; gap: 8px;">
+              <span class="emoji-option barcode-icon" data-emoji="𝄃𝄃𝄂𝄂𝄀𝄁𝄃𝄂𝄂𝄃" style="font-size: 20px; width: 70px;">𝄃𝄃𝄂𝄂𝄀𝄁𝄃𝄂𝄂𝄃</span>
+              <span class="emoji-option" data-emoji="🛍️">🛍️</span>
+              <span class="emoji-option" data-emoji="🏪">🏪</span>
+              <span class="emoji-option" data-emoji="💳">💳</span>
+              <span class="emoji-option" data-emoji="📦">📦</span>
+              <span class="emoji-option" data-emoji="🏷️">🏷️</span>
+              <span class="emoji-option" data-emoji="🎫">🎫</span>
+              <span class="emoji-option" data-emoji="🔢">🔢</span>
+              <span class="emoji-option" data-emoji="📊">📊</span>
+              <span class="emoji-option" data-emoji="📈">📈</span>
+              <span class="emoji-option" data-emoji="📉">📉</span>
+              <span class="emoji-option" data-emoji="🛒">🛒</span>
+              <span class="emoji-option" data-emoji="📋">📋</span>
+              <span class="emoji-option" data-emoji="✅">✅</span>
+              <span class="emoji-option" data-emoji="📝">📝</span>
+              <span class="emoji-option" data-emoji="🏢">🏢</span>
+              <span class="emoji-option" data-emoji="💼">💼</span>
+              <span class="emoji-option" data-emoji="📁">📁</span>
+              <span class="emoji-option" data-emoji="📂">📂</span>
+              <span class="emoji-option" data-emoji="🗂️">🗂️</span>
+              <span class="emoji-option" data-emoji="📑">📑</span>
+              <span class="emoji-option" data-emoji="🗃️">🗃️</span>
+              <span class="emoji-option" data-emoji="📇">📇</span>
+              <span class="emoji-option" data-emoji="🔍">🔍</span>
+              <span class="emoji-option" data-emoji="🔎">🔎</span>
+              <span class="emoji-option" data-emoji="📌">📌</span>
+              <span class="emoji-option" data-emoji="📍">📍</span>
+              <span class="emoji-option" data-emoji="✏️">✏️</span>
+              <span class="emoji-option" data-emoji="✒️">✒️</span>
+              <span class="emoji-option" data-emoji="🖊️">🖊️</span>
+              <span class="emoji-option" data-emoji="🖍️">🖍️</span>
+              <span class="emoji-option" data-emoji="📐">📐</span>
+              <span class="emoji-option" data-emoji="📏">📏</span>
+              <span class="emoji-option" data-emoji="🔧">🔧</span>
+              <span class="emoji-option" data-emoji="🔨">🔨</span>
+              <span class="emoji-option" data-emoji="⚙️">⚙️</span>
+              <span class="emoji-option" data-emoji="🛠️">🛠️</span>
+              <span class="emoji-option" data-emoji="🔩">🔩</span>
+              <span class="emoji-option" data-emoji="⚡">⚡</span>
+              <span class="emoji-option" data-emoji="💡">💡</span>
+              <span class="emoji-option" data-emoji="🔔">🔔</span>
+              <span class="emoji-option" data-emoji="🔕">🔕</span>
+              <span class="emoji-option" data-emoji="📢">📢</span>
+              <span class="emoji-option" data-emoji="📣">📣</span>
+              <span class="emoji-option" data-emoji="📞">📞</span>
+              <span class="emoji-option" data-emoji="☎️">☎️</span>
+              <span class="emoji-option" data-emoji="📱">📱</span>
+              <span class="emoji-option" data-emoji="💻">💻</span>
+              <span class="emoji-option" data-emoji="🖥️">🖥️</span>
+              <span class="emoji-option" data-emoji="⌨️">⌨️</span>
+              <span class="emoji-option" data-emoji="🖨️">🖨️</span>
+              <span class="emoji-option" data-emoji="🖱️">🖱️</span>
+              <span class="emoji-option" data-emoji="💾">💾</span>
+              <span class="emoji-option" data-emoji="💿">💿</span>
+              <span class="emoji-option" data-emoji="📀">📀</span>
+              <span class="emoji-option" data-emoji="🧮">🧮</span>
+              <span class="emoji-option" data-emoji="🗄️">🗄️</span>
+              <span class="emoji-option" data-emoji="📮">📮</span>
+              <span class="emoji-option" data-emoji="📬">📬</span>
+              <span class="emoji-option" data-emoji="📭">📭</span>
+              <span class="emoji-option" data-emoji="📫">📫</span>
+              <span class="emoji-option" data-emoji="✉️">✉️</span>
+              <span class="emoji-option" data-emoji="📧">📧</span>
+              <span class="emoji-option" data-emoji="📨">📨</span>
+              <span class="emoji-option" data-emoji="📩">📩</span>
+              <span class="emoji-option" data-emoji="📤">📤</span>
+              <span class="emoji-option" data-emoji="📥">📥</span>
+              <span class="emoji-option" data-emoji="🗳️">🗳️</span>
+              <span class="emoji-option" data-emoji="🏷️">🏷️</span>
+              <span class="emoji-option" data-emoji="🔖">🔖</span>
+              <span class="emoji-option" data-emoji="📎">📎</span>
+              <span class="emoji-option" data-emoji="🖇️">🖇️</span>
+              <span class="emoji-option" data-emoji="📏">📏</span>
+              <span class="emoji-option" data-emoji="📐">📐</span>
+              <span class="emoji-option" data-emoji="✂️">✂️</span>
+              <span class="emoji-option" data-emoji="🗂️">🗂️</span>
+              <span class="emoji-option" data-emoji="🗓️">🗓️</span>
+              <span class="emoji-option" data-emoji="📅">📅</span>
+              <span class="emoji-option" data-emoji="📆">📆</span>
+              <span class="emoji-option" data-emoji="🗒️">🗒️</span>
+              <span class="emoji-option" data-emoji="🗑️">🗑️</span>
+              <span class="emoji-option" data-emoji="🔒">🔒</span>
+              <span class="emoji-option" data-emoji="🔓">🔓</span>
+              <span class="emoji-option" data-emoji="🔐">🔐</span>
+              <span class="emoji-option" data-emoji="🔑">🔑</span>
+              <span class="emoji-option" data-emoji="🗝️">🗝️</span>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="/static/js/theme.js"></script>
+    <script src="/static/js/keyboard.js"></script>
+    <script src="/static/js/admin-items.js"></script>
+  </body>
+</html>
