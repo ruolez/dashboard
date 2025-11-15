@@ -152,14 +152,14 @@ configure_nginx() {
     local app_port=5000
     if [[ -f "${COMPOSE_FILE}" ]]; then
         # Extract port from docker-compose.yml if exists
-        local port_line=$(grep -A 5 "ports:" "${COMPOSE_FILE}" | grep -oP '127.0.0.1:\K[0-9]+' | head -1)
-        if [[ -n "$port_line" ]]; then
+        local port_line=$(grep -A 5 "ports:" "${COMPOSE_FILE}" 2>/dev/null | grep -o '127.0.0.1:[0-9]*' 2>/dev/null | cut -d: -f2 | head -1)
+        if [[ -n "$port_line" ]] && [[ "$port_line" =~ ^[0-9]+$ ]]; then
             app_port=$port_line
         fi
     fi
 
-    # Create nginx configuration
-    cat > "${NGINX_CONF}" <<EOF
+    # Create nginx configuration (redirect stderr to avoid contamination)
+    cat > "${NGINX_CONF}" 2>/dev/null <<EOF
 server {
     listen 80;
     server_name ${server_ip};
@@ -203,11 +203,16 @@ EOF
     rm -f /etc/nginx/sites-enabled/default
 
     # Test nginx configuration
-    if nginx -t &> /dev/null; then
+    if nginx -t 2>&1 | grep -q "syntax is ok"; then
         systemctl reload nginx
         print_success "Nginx configured successfully"
     else
         print_error "Nginx configuration test failed"
+        echo ""
+        print_warning "Generated nginx config:"
+        cat "${NGINX_CONF}"
+        echo ""
+        print_error "Nginx test output:"
         nginx -t
         exit 1
     fi
