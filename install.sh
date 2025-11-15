@@ -131,15 +131,20 @@ install_docker() {
 install_nginx() {
     if command -v nginx &> /dev/null; then
         print_success "Nginx already installed"
-        return 0
+    else
+        print_info "Installing Nginx..."
+        apt-get update -qq
+        apt-get install -y -qq nginx
+        systemctl start nginx
+        systemctl enable nginx
+        print_success "Nginx installed successfully"
     fi
 
-    print_info "Installing Nginx..."
-    apt-get update -qq
-    apt-get install -y -qq nginx
-    systemctl start nginx
-    systemctl enable nginx
-    print_success "Nginx installed successfully"
+    # Ensure curl is installed for health checks
+    if ! command -v curl &> /dev/null; then
+        print_info "Installing curl..."
+        apt-get install -y -qq curl
+    fi
 }
 
 # Configure nginx reverse proxy
@@ -239,9 +244,6 @@ POSTGRES_DB=dashboard
 SERVER_IP=${server_ip}
 PORT=127.0.0.1:5000
 
-# Volume Configuration (disable live code reload in production)
-APP_VOLUME=/app/app
-
 # Session Configuration
 SESSION_COOKIE_SECURE=False
 SESSION_COOKIE_HTTPONLY=True
@@ -308,15 +310,54 @@ clean_install() {
     docker compose build --no-cache
     docker compose up -d
 
-    # Wait for services to be ready
-    print_info "Waiting for services to start..."
-    sleep 10
+    # Wait for database to be ready
+    print_info "Waiting for database to be ready..."
+    local max_attempts=30
+    local attempt=0
+    while [ $attempt -lt $max_attempts ]; do
+        if docker compose exec -T db pg_isready -U dashboard &>/dev/null; then
+            print_success "Database is ready"
+            break
+        fi
+        attempt=$((attempt + 1))
+        sleep 1
+    done
 
-    # Check if containers are running
+    if [ $attempt -eq $max_attempts ]; then
+        print_error "Database failed to start"
+        docker compose logs db
+        exit 1
+    fi
+
+    # Wait for Flask app to be ready
+    print_info "Waiting for Flask application to start..."
+    sleep 5
+
+    max_attempts=30
+    attempt=0
+    while [ $attempt -lt $max_attempts ]; do
+        if curl -s http://127.0.0.1:5000 &>/dev/null; then
+            print_success "Application is responding"
+            break
+        fi
+        attempt=$((attempt + 1))
+        sleep 1
+    done
+
+    if [ $attempt -eq $max_attempts ]; then
+        print_error "Application failed to start"
+        echo ""
+        print_warning "Application logs:"
+        docker compose logs app
+        exit 1
+    fi
+
+    # Final container check
     if docker compose ps | grep -q "Up"; then
-        print_success "Application started successfully"
+        print_success "All services running"
     else
-        print_error "Failed to start application"
+        print_error "Some services failed to start"
+        docker compose ps
         docker compose logs
         exit 1
     fi
